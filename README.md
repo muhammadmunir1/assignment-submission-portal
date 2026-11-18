@@ -6,9 +6,8 @@ Course: DevOps for Cloud Computing (CSC418) · Instructor: Mr. Babar Shazad
 
 COMSATS University Islamabad, Attock Campus · Lab Mid
 
-[![CI](https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-username>/<your-repo>/actions/workflows/ci.yml)
+[![CI](https://github.com/muhammadmunir1/assignment-submission-portal/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadmunir1/assignment-submission-portal/actions/workflows/ci.yml)
 
-Replace `<your-username>` and `<your-repo>` in both badge URLs with your GitHub owner and repository name. The workflow file is `.github/workflows/ci.yml` and its name is `CI`.
 
 Students submit an assignment through a small PHP portal: full name, registration number, title, and an `http` or `https` link. GitHub Actions runs the PHPUnit suite on every push, writes `testreport.json`, sends that file through ngrok to a receiver on the lab machine, and emails the result. A push to `main` publishes the static portal to GitHub Pages only when the test job is green.
 
