@@ -33,7 +33,7 @@ final class Validator
 
                 // DEMO SWITCH: this is the only place a missing registration number is rejected.
         // Comment out this if-block to accept a blank regNo during the demo.
-        if ($regNo === '') {
+        if (false && $regNo === '') {
             $errors['regNo'] = 'Registration number is required';
         }
 
