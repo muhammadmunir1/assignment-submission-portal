@@ -1,0 +1,159 @@
+<!-- Author: Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#12305C">
+  <title>Assignment Submission Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,560;8..60,650&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <div class="brand">
+        <p class="eyebrow">COMSATS University Islamabad, Attock Campus</p>
+        <p class="wordmark">Department of Computer Science</p>
+        <p class="brand-sub">Assignment Submission Portal</p>
+      </div>
+      <p id="api-status" class="status" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="api-status-label">Checking</span>
+      </p>
+    </div>
+    <div class="header-rule" aria-hidden="true"></div>
+  </header>
+
+  <main id="main" class="shell" tabindex="-1">
+    <div class="intro">
+      <div class="intro-copy">
+        <p class="kicker">CSC418 · DevOps for Cloud Computing</p>
+        <h1>Submit an assignment</h1>
+        <p>Add your name, registration number, and a link to the work you want reviewed.</p>
+      </div>
+      <ol class="steps">
+        <li><span>01</span>Your details</li>
+        <li><span>02</span>The assignment</li>
+        <li><span>03</span>A review link</li>
+      </ol>
+    </div>
+
+    <div class="layout">
+      <section class="card card-form" aria-labelledby="form-title">
+        <p class="card-kicker">New record</p>
+        <h2 id="form-title">New submission</h2>
+        <form id="submission-form" novalidate>
+          <div class="field">
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" autocomplete="name" inputmode="text" placeholder="Ali Khan" aria-required="true" aria-describedby="name-help">
+            <p id="name-help" class="help">The name your instructor should see.</p>
+            <p id="name-error" class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="regNo">Registration number</label>
+            <input id="regNo" name="regNo" type="text" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false" placeholder="FA22-BCS-001" aria-required="true" aria-describedby="regNo-help">
+            <p id="regNo-help" class="help">Letters, numbers, dashes and slashes, 3 to 30 characters.</p>
+            <p id="regNo-error" class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="title">Assignment title</label>
+            <input id="title" name="title" type="text" autocomplete="off" inputmode="text" placeholder="Lab Mid - DevOps Pipeline" aria-required="true" aria-describedby="title-help">
+            <p id="title-help" class="help">Between 3 and 150 characters.</p>
+            <p id="title-error" class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="url">Submission URL</label>
+            <input id="url" name="url" type="text" autocomplete="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://github.com/username/repository" aria-required="true" aria-describedby="url-help">
+            <p id="url-help" class="help">Must start with http:// or https://.</p>
+            <p id="url-error" class="field-error"></p>
+          </div>
+
+          <p id="form-error" class="field-error form-error"></p>
+          <p id="form-status" class="sr-only" role="status" aria-live="polite"></p>
+
+          <button id="submit-button" type="submit">
+            <svg class="spinner" viewBox="0 0 24 24" aria-hidden="true" hidden>
+              <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-dasharray="32 18"></circle>
+            </svg>
+            <span id="submit-label">Submit assignment</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="list-title">
+        <div class="card-head">
+          <div class="card-heading">
+            <div>
+              <p class="card-kicker">Review queue</p>
+              <h2 id="list-title">Submissions</h2>
+            </div>
+            <span id="count-chip" class="chip" aria-label="Loading submissions">…</span>
+          </div>
+          <div class="search">
+            <label class="sr-only" for="search">Search submissions</label>
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.75"></circle>
+              <path d="M16.5 16.5 21 21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
+            </svg>
+            <input id="search" type="search" placeholder="Search submissions" autocomplete="off" disabled>
+          </div>
+        </div>
+
+        <div id="list-panel"></div>
+        <div class="table-wrap" id="table-wrap">
+          <table class="submissions-table">
+            <caption class="sr-only">Submitted assignments</caption>
+            <thead>
+              <tr>
+                <th scope="col">Student</th>
+                <th scope="col">Assignment</th>
+                <th scope="col">Link</th>
+                <th scope="col">Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="submission-list">
+              <tr class="skeleton">
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar"></span></td>
+              </tr>
+              <tr class="skeleton">
+                <td><span class="skeleton-bar short"></span></td>
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar short"></span></td>
+                <td><span class="skeleton-bar short"></span></td>
+              </tr>
+              <tr class="skeleton">
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar short"></span></td>
+                <td><span class="skeleton-bar"></span></td>
+                <td><span class="skeleton-bar short"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p>Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK</p>
+      <p>CSC418 · DevOps for Cloud Computing · COMSATS University Islamabad, Attock Campus</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="assets/app.js"></script>
+</body>
+</html>

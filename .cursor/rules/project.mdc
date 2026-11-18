@@ -1,0 +1,156 @@
+---
+description: Permanent contract for the Assignment Submission Portal (CSC418)
+alwaysApply: true
+---
+
+# Assignment Submission Portal — Project Contract
+
+Follow this contract on every task in this project. Do not invent extra features, placeholders, or half-finished work.
+
+## Author identity
+
+Use this identity exactly wherever this contract says "author line":
+
+Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK
+
+Course: DevOps for Cloud Computing (CSC418), Instructor: Mr. Babar Shazad, COMSATS University Islamabad, Attock Campus. Lab Mid, October 26, 2026.
+
+The one-line form, used in source comments, is:
+
+`Author: Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK`
+
+### Where the author line must appear
+
+- First comment block of every PHP file, workflow YAML, and JS/CSS file (one line: `Author: Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK`)
+- `composer.json` `"authors"` (`name`: Muhammad Munir) and `description`
+- Portal footer (`public/index.html`), small muted text
+- Receiver dashboard footer
+- Email HTML footer
+- `README.md` (header block + "Author" section) and `DEMO.md` header
+
+Do NOT add the author line to the `testreport.json` schema. Never use it as fake submission data in the portal's seeded demo rows (those stay clearly fictional).
+
+## Project
+
+"Assignment Submission Portal" for the university lab CSC418 (DevOps).
+
+- Plain PHP 8.1+ (no framework)
+- Vanilla HTML/CSS/JS
+- PHPUnit ^10.5 via Composer
+- GitHub Actions
+- Dev machine is Windows; everything must work on Windows, macOS, and Linux
+- Use LF line endings
+- No TODOs, placeholders, or half-finished features
+- Quality bar: polished, like a senior developer and designer built it
+- No AI-looking UI: no gradients, emojis, glassmorphism, or purple
+
+## Structure
+
+```
+src/Validator.php
+src/Store.php
+src/SubmissionService.php
+src/Api.php
+public/index.html
+public/api.php
+public/assets/styles.css
+public/assets/app.js
+tests/SubmissionTest.php
+tests/ApiTest.php
+receiver/receiver.php
+receiver/.env.example
+scripts/build-report.php
+scripts/build-email.php
+scripts/send-report.php
+.github/workflows/ci.yml
+composer.json
+phpunit.xml
+README.md
+DEMO.md
+.gitignore
+.gitattributes
+.editorconfig
+```
+
+`.gitignore` excludes: `vendor/`, `data/`, `testreport.json`, `junit.xml`, `email.html`, `reports/`, `dist/`, `receiver/.env`, `.phpunit.cache/`
+
+## Code style
+
+- `declare(strict_types=1);`
+- PSR-4: `"App\\" => "src/"`
+- Typed properties and return types
+- Short, human-style comments
+
+## Exact validation messages
+
+| Field | Messages |
+|---|---|
+| name | `Full name is required` \| `Name must be between 2 and 100 characters` |
+| regNo | `Registration number is required` \| `Registration number may only contain letters, numbers, dashes and slashes` (3–30 chars) |
+| title | `Assignment title is required` \| `Title must be between 3 and 150 characters` |
+| url | `Submission URL is required` \| `Enter a valid URL starting with http:// or https://` |
+
+## Required test names (exact)
+
+- `test_complete_details_and_valid_url_is_saved_and_listed`
+- `test_missing_registration_number_is_rejected_with_validation_message`
+- `test_invalid_submission_url_is_rejected_and_not_saved`
+
+## API contract
+
+- `GET /api.php` → `200` `{ok, count, submissions}`
+- `POST` valid → `201` `{ok: true, submission}`
+- Invalid → `422` `{ok: false, message: "Validation failed", errors: {field: message}}`
+- Bad JSON → `400`
+- Over 16KB → `413`
+- Other methods → `405` with `Allow` header
+
+## Report JSON shape (`testreport.json`)
+
+```json
+{
+  "repository": "",
+  "branch": "",
+  "commitSha": "",
+  "commitShort": "",
+  "runId": "",
+  "runNumber": "",
+  "runUrl": "",
+  "actor": "",
+  "timestamp": "ISO-8601 UTC",
+  "status": "passed | failed | error",
+  "summary": { "total": 0, "passed": 0, "failed": 0, "skipped": 0 },
+  "tests": [
+    {
+      "name": "",
+      "class": "",
+      "result": "passed | failed | skipped",
+      "durationMs": 0,
+      "failureMessage": null
+    }
+  ],
+  "errorMessage": "only when status is error"
+}
+```
+
+The receiver adds `receivedAt`. Do not put the author line in this schema.
+
+## Environment variables and secrets
+
+`REPORT_URL`, `REPORT_TOKEN`, `REPORT_EMAIL_TO`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `SUBMISSIONS_FILE`.
+
+Never hardcode secrets.
+
+## Composer scripts
+
+- `serve`: `php -S localhost:8000 -t public`
+- `receiver`: `php -S localhost:4000 receiver/receiver.php`
+- `test`: phpunit
+- `report:local`
+- `email:preview`
+
+Server scripts must disable the Composer process timeout and use `@php` so they work on Windows.
+
+## Workflow
+
+After every phase: run the verification commands, fix every problem, then give a short summary of what was done and how to verify it.

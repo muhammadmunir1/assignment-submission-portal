@@ -1,0 +1,9 @@
+vendor/
+data/
+testreport.json
+junit.xml
+email.html
+reports/
+dist/
+receiver/.env
+.phpunit.cache/

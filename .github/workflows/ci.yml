@@ -1,0 +1,141 @@
+# Author: Muhammad Munir | Reg No: CIIT/FA22-BCS-071/ATK
+# Run the test suite, deliver the report, email it, and publish the static portal.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      REPORT_URL: ${{ secrets.REPORT_URL }}
+      REPORT_TOKEN: ${{ secrets.REPORT_TOKEN }}
+      REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, curl, simplexml, dom, libxml, json
+          coverage: none
+
+      - name: Locate Composer cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run automated tests
+        id: tests
+        continue-on-error: true
+        run: vendor/bin/phpunit --log-junit junit.xml
+
+      # always(): a red suite must still produce the report that gets delivered.
+      - name: Build test report
+        if: always()
+        run: php scripts/build-report.php
+
+      # always(): keep the JUnit log and the report even when the suite failed.
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: |
+            testreport.json
+            junit.xml
+          if-no-files-found: warn
+
+      # always(): still try to deliver after a failure. continue-on-error so a
+      # sleeping laptop warns instead of painting the job red.
+      - name: Send report to local receiver
+        if: always()
+        continue-on-error: true
+        run: php scripts/send-report.php
+
+      # always(): build the message from the report even when the suite failed.
+      - name: Build email
+        id: email
+        if: always()
+        run: php scripts/build-email.php
+
+      # always(): send only when an address is set. continue-on-error so SMTP trouble warns.
+      - name: Send email
+        if: always() && env.REPORT_EMAIL_TO != ''
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v24
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          to: ${{ secrets.REPORT_EMAIL_TO }}
+          from: "CI Reports <${{ secrets.EMAIL_USERNAME }}>"
+          subject: ${{ steps.email.outputs.subject }}
+          html_body: file://email.html
+          attachments: testreport.json
+
+      # Last on purpose: the report is built and sent before a test failure turns the job red.
+      - name: Fail the job when tests failed
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "Tests failed"
+          exit 1
+
+  # needs: test is what guarantees deploy only on all-green.
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare the static site
+        run: |
+          rm -rf dist
+          mkdir dist
+          cp -a public/. dist/
+          rm -f dist/api.php
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
